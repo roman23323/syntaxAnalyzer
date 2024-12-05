@@ -24,6 +24,10 @@ grammar = """
 """
 
 class XMLTransformer(Transformer):
+    def __init__(self):
+        super().__init__()
+        self.variables = {}
+
     def start(self, items):
         start_el = ET.Element("start")
         for i in items:
@@ -33,6 +37,7 @@ class XMLTransformer(Transformer):
     def const_decl(self, items):
         const_decl_el = ET.Element(items[0])
         const_decl_el.append(items[1])
+        self.variables[items[0]] = items[1]
         return const_decl_el
 
     def array(self, items):
@@ -47,12 +52,17 @@ class XMLTransformer(Transformer):
         return number_el
 
     def const_eval(self, items):
-        const_eval_el = ET.Element('const_eval')
-        const_eval_el.text = items[0]
-        return const_eval_el
+        print(items[0])
+        if items[0] in self.variables:
+            const_eval_el = ET.Element('const_eval')
+            const_eval_el.append(self.variables[items[0]])
+            return const_eval_el
+        else:
+            print(f"Переменная {items[0]} не была инициализирована!")
+            exit(1)
 
-    def NAME(self, items):
-        return items[0]
+    def NAME(self, item):
+        return item
 
     def dictionary(self, items):
         dictionary_el = ET.Element('dictionary')
@@ -71,11 +81,9 @@ parser = Lark(grammar, parser='lalr', transformer=XMLTransformer())
 
 # Пример текста для парсинга
 text = """
-    def a = 2
+    def abc = 2
     def b = '(1 2)
     def c = $[d:2, e:1]
-    ?{a}
-    ?{c}
     def f = '(
         $[
             g: '(1 2 3),
@@ -88,4 +96,7 @@ text = """
 xml_result = parser.parse(text)
 tree = ET.ElementTree(xml_result)
 output_file_path = "output.xml"
-tree.write(output_file_path, encoding='utf-8', xml_declaration=True)
+
+# Открываем файл для записи
+with open(output_file_path, 'wb') as output_file:
+    tree.write(output_file, encoding='utf-8', xml_declaration=True)
