@@ -1,0 +1,4 @@
+def dog = '(4 0 7)
+def cat = $[c:3, a:9, t:7]
+?{dog}
+?{cat}

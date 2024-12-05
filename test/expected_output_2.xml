@@ -1,0 +1,2 @@
+<?xml version='1.0' encoding='utf-8'?>
+<start><dog><array><number>4</number><number>0</number><number>7</number></array></dog><cat><dictionary><c><number>3</number></c><a><number>9</number></a><t><number>7</number></t></dictionary></cat><const_eval><array><number>4</number><number>0</number><number>7</number></array></const_eval><const_eval><dictionary><c><number>3</number></c><a><number>9</number></a><t><number>7</number></t></dictionary></const_eval></start>

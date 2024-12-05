@@ -1,0 +1,2 @@
+<?xml version='1.0' encoding='utf-8'?>
+<start><abc><number>2</number></abc><b><array><number>1</number><number>2</number></array></b><c><dictionary><d><number>2</number></d><e><number>1</number></e></dictionary></c><f><array><dictionary><g><array><number>12</number><number>23</number><number>34</number></array></g><h><number>4</number></h></dictionary></array></f></start>
