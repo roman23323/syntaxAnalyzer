@@ -1,5 +1,6 @@
 from lark import Lark, Transformer
 import xml.etree.ElementTree as ET
+import argparse
 
 grammar = """
     start: (const_decl | const_eval)*
@@ -46,13 +47,12 @@ class XMLTransformer(Transformer):
             array_el.append(item)
         return array_el
 
-    def NUMBER(self, items):
+    def NUMBER(self, item):
         number_el = ET.Element('number')
-        number_el.text = items[0]
+        number_el.text = item
         return number_el
 
     def const_eval(self, items):
-        print(items[0])
         if items[0] in self.variables:
             const_eval_el = ET.Element('const_eval')
             const_eval_el.append(self.variables[items[0]])
@@ -75,28 +75,37 @@ class XMLTransformer(Transformer):
         dict_item_el.append(items[1])
         return dict_item_el
 
+def parse_arguments():
+    parser = argparse.ArgumentParser(description='Обработка входного текста и вывод в XML.')
+    parser.add_argument('-i', '--input', required=True, help='Путь к входному текстовому файлу')
+    parser.add_argument('-o', '--output', required=True, help='Путь к выходному XML-файлу')
+    return parser.parse_args()
 
-# Создаем парсер
-parser = Lark(grammar, parser='lalr', transformer=XMLTransformer())
+def read_input_file(input_path):
+    with open(input_path, 'r', encoding='utf-8') as file:
+        return file.read()
 
-# Пример текста для парсинга
-text = """
-    def abc = 2
-    def b = '(1 2)
-    def c = $[d:2, e:1]
-    def f = '(
-        $[
-            g: '(1 2 3),
-            h: 4
-        ]
-    )
-"""
+def write_output_file(output_path, data):
+    with open(output_path, 'wb') as output_file:
+        data.write(output_file, encoding='utf-8', xml_declaration=True)
 
-# Парсим текст и выводим результат в XML
-xml_result = parser.parse(text)
-tree = ET.ElementTree(xml_result)
-output_file_path = "output.xml"
+def main():
+    # Получение аргументов командной строки
+    args = parse_arguments()
 
-# Открываем файл для записи
-with open(output_file_path, 'wb') as output_file:
-    tree.write(output_file, encoding='utf-8', xml_declaration=True)
+    # Чтение входного файла
+    input_text = read_input_file(args.input)
+
+    # Создаем парсер
+    parser_lark = Lark(grammar, parser='lalr', transformer=XMLTransformer())
+    xml_result = parser_lark.parse(input_text)
+    tree = ET.ElementTree(xml_result)
+    output_file_path = "output.xml"
+
+    # Запись результата в выходной файл
+    write_output_file(args.output, tree)
+
+    print("Текст успешно обработан!")
+
+if __name__ == "__main__":
+    main()
